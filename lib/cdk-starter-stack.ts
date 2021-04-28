@@ -5,65 +5,55 @@ export class CdkStarterStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // 👇 Create ACM Permission Policy
-    const describeAcmCertificates = new iam.PolicyDocument({
-      statements: [
-        new iam.PolicyStatement({
-          resources: ['arn:aws:acm:*:*:certificate/*'],
-          actions: ['acm:DescribeCertificate'],
-        }),
-      ],
-    });
-
-    // 👇 Create role
-    const role = new iam.Role(this, 'example-iam-role', {
-      assumedBy: new iam.ServicePrincipal('apigateway.amazonaws.com'),
-      description: 'An example IAM role in AWS CDK',
-      // 👇 created with the role, whereas `addToPolicy` ones are added via a separate CloudFormation reosurce ( allows us to avoid circular dependencies )
-      inlinePolicies: {
-        DescribeACMCerts: describeAcmCertificates,
-      },
+    // 👇 create an IAM group
+    const group = new iam.Group(this, 'group-id', {
       managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName(
-          'AmazonAPIGatewayInvokeFullAccess',
-        ),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ReadOnlyAccess'),
       ],
     });
 
-    // 👇 add an Inline Policy to role
-    role.addToPolicy(
-      new iam.PolicyStatement({
-        actions: ['logs:CreateLogGroup', 'logs:CreateLogStream'],
-        resources: ['*'],
-      }),
-    );
+    console.log('group name 👉', group.groupName);
+    console.log('group arn 👉', group.groupArn);
 
-    // 👇 add a Managed Policy to role
-    role.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName(
-        'service-role/AmazonAPIGatewayPushToCloudWatchLogs',
-      ),
-    );
+    // // 👇 add managed policy to a group
+    // group.addManagedPolicy(
+    //   iam.ManagedPolicy.fromAwsManagedPolicyName(
+    //     'service-role/AWSLambdaBasicExecutionRole',
+    //   ),
+    // );
 
-    // 👇 attach an Inline Policy to role
-    role.attachInlinePolicy(
-      new iam.Policy(this, 'cw-logs', {
-        statements: [
-          new iam.PolicyStatement({
-            actions: ['logs:PutLogEvents'],
-            resources: ['*'],
-          }),
-        ],
-      }),
-    );
+    // // 👇 add an inline policy to a group
+    // group.addToPolicy(
+    //   new iam.PolicyStatement({
+    //     actions: ['logs:CreateLogGroup', 'logs:CreateLogStream'],
+    //     resources: ['*'],
+    //   }),
+    // );
 
-    // 👇 Add the Lambda service as a Principal
-    role.assumeRolePolicy?.addStatements(
-      new iam.PolicyStatement({
-        actions: ['sts:AssumeRole'],
-        effect: iam.Effect.ALLOW,
-        principals: [new iam.ServicePrincipal('lambda.amazonaws.com')],
-      }),
-    );
+    // // 👇 attach an inline policy on the group
+    // group.attachInlinePolicy(
+    //   new iam.Policy(this, 'cw-logs', {
+    //     statements: [
+    //       new iam.PolicyStatement({
+    //         effect: iam.Effect.DENY,
+    //         actions: ['logs:PutLogEvents'],
+    //         resources: ['*'],
+    //       }),
+    //     ],
+    //   }),
+    // );
+
+    // // 👇 create IAM User
+    // const user = new iam.User(this, 'user-id');
+
+    // // 👇 add the User to the group
+    // group.addUser(user);
+
+    // 👇 import existing Group
+    // const externalGroup = iam.Group.fromGroupArn(
+    //   this,
+    //   'external-group-id',
+    //   `arn:aws:iam::${cdk.Stack.of(this).account}:group/YOUR_GROUP_NAME`,
+    // );
   }
 }
