@@ -15,39 +15,39 @@ export class CdkStarterStack extends cdk.Stack {
     console.log('group name 👉', group.groupName);
     console.log('group arn 👉', group.groupArn);
 
-    // // 👇 add managed policy to a group
-    // group.addManagedPolicy(
-    //   iam.ManagedPolicy.fromAwsManagedPolicyName(
-    //     'service-role/AWSLambdaBasicExecutionRole',
-    //   ),
-    // );
+    // 👇 add managed policy to a group
+    group.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName(
+        'service-role/AWSLambdaBasicExecutionRole',
+      ),
+    );
 
-    // // 👇 add an inline policy to a group
-    // group.addToPolicy(
-    //   new iam.PolicyStatement({
-    //     actions: ['logs:CreateLogGroup', 'logs:CreateLogStream'],
-    //     resources: ['*'],
-    //   }),
-    // );
+    // 👇 add an inline policy to a group
+    group.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['logs:CreateLogGroup', 'logs:CreateLogStream'],
+        resources: ['*'],
+      }),
+    );
 
-    // // 👇 attach an inline policy on the group
-    // group.attachInlinePolicy(
-    //   new iam.Policy(this, 'cw-logs', {
-    //     statements: [
-    //       new iam.PolicyStatement({
-    //         effect: iam.Effect.DENY,
-    //         actions: ['logs:PutLogEvents'],
-    //         resources: ['*'],
-    //       }),
-    //     ],
-    //   }),
-    // );
+    // 👇 attach an inline policy on the group
+    group.attachInlinePolicy(
+      new iam.Policy(this, 'cw-logs', {
+        statements: [
+          new iam.PolicyStatement({
+            effect: iam.Effect.DENY,
+            actions: ['logs:PutLogEvents'],
+            resources: ['*'],
+          }),
+        ],
+      }),
+    );
 
-    // // 👇 create IAM User
-    // const user = new iam.User(this, 'user-id');
+    // 👇 create IAM User
+    const user = new iam.User(this, 'user-id');
 
-    // // 👇 add the User to the group
-    // group.addUser(user);
+    // 👇 add the User to the group
+    group.addUser(user);
 
     // 👇 import existing Group
     // const externalGroup = iam.Group.fromGroupArn(
