@@ -1,7 +1,7 @@
 # AWS CDK IAM Group Example - Complete Guide
 
 A repository for an article on
-[bobbyhadz.com](https://bobbyhadz.com/blog/aws-cdk-iam-group)
+[bobbyhadz.com](https://bobbyhadz.com/blogcreate-iam-user-aws-cdk)
 
 > If you use CDK v1, switch to the cdk-v1 branch
 
